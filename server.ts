@@ -1,4 +1,5 @@
 import express from "express";
+import { LRUCache } from "lru-cache";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import Parser from "rss-parser";
@@ -583,6 +584,8 @@ async function pollRSSFeeds() {
   }
 }
 
+const apiCache = new LRUCache({ max: 500, ttl: 1000 * 60 * 5 });
+
 async function startServer() {
   const app = express();
   // Trust the reverse proxy (specifically required for express-rate-limit behind a proxy like here in the container)
@@ -629,6 +632,12 @@ async function startServer() {
   app.get("/api/news", async (req, res) => {
     try {
       const { region, category, limit } = req.query;
+      const cacheKey = `news_${region || ''}_${category || ''}_${limit || ''}`;
+      const cached = apiCache.get(cacheKey);
+      if (cached) {
+         return res.json({ data: cached });
+      }
+
       let q = collection(firebaseDb, "articles") as any;
 
       if (
@@ -665,15 +674,52 @@ async function startServer() {
 
       data = data.map((m: any) => {
          if (m.imageUrl && (m.imageUrl.includes('picsum.photos') || m.imageUrl.includes('api/assets/visual'))) {
-             m.imageUrl = getStableImage(m.title || "default", m.category || 'Editorial');
+             delete m.imageUrl;
          }
          return m;
       });
 
+      apiCache.set(cacheKey, data);
       res.json({ data });
-    } catch (e) {
-      console.error(e);
-      res.status(500).json({ error: "Failed to fetch articles" });
+    } catch (e: any) {
+      console.error('Firebase DB query failed, falling back to Drizzle:', e.message);
+      try {
+        const { limit } = req.query;
+        // Fallback to sourceItems from PostgreSQL
+        const drizzleSnap = await drizzleDb.select().from(sourceItems).orderBy(sourceItems.originalPublishedAt).limit(limit ? parseInt(limit as string, 10) : 100);
+        
+        let data = drizzleSnap.reverse().map(item => ({
+          id: item.id,
+          title: item.originalTitle || "Untitled",
+          slug: item.id,
+          sourceName: item.sourceName || "Global Syndicate",
+          sourceUrl: item.sourceUrl || "#",
+          originalUrl: item.originalUrl || "#",
+          publishedAt: item.originalPublishedAt || new Date().toISOString(),
+          fetchedAt: item.fetchedAt || new Date().toISOString(),
+          category: item.category || "Economy",
+          region: "Global",
+          language: "en",
+          aiSummary: item.excerpt || "Initial signals intercepted. Awaiting full AI analysis.",
+          fullContent: item.excerpt || "Initial signals intercepted. Awaiting full AI analysis.",
+          tags: ["Live Feed", "Unclassified"],
+          importanceScore: 70 + Math.floor(Math.random() * 20),
+          relevanceScore: 75 + Math.floor(Math.random() * 20),
+          credibilityScore: item.credibilityScore || 85,
+        }));
+        
+        const seenTitles = new Set();
+        data = data.filter((m: any) => {
+           if (seenTitles.has(m.title)) return false;
+           seenTitles.add(m.title);
+           return true;
+        });
+
+        res.json({ data });
+      } catch (fallbackErr) {
+        console.error(fallbackErr);
+        res.status(500).json({ error: "Failed to fetch articles from both sources" });
+      }
     }
   });
 
@@ -720,16 +766,53 @@ async function startServer() {
   });
 
   app.get("/api/news/:id", async (req, res) => {
+    const cacheKey = `news_id_${req.params.id}`;
     try {
+      const cached = apiCache.get(cacheKey);
+      if (cached) {
+         return res.json({ data: cached });
+      }
+
       const snap = await getDoc(doc(firebaseDb, "articles", req.params.id));
       if (!snap.exists()) return res.status(404).json({ error: "Not found" });
       const m = snap.data();
       if (m.imageUrl && (m.imageUrl.includes('picsum.photos') || m.imageUrl.includes('api/assets/visual'))) {
-          m.imageUrl = getStableImage(m.title || "default", m.category || 'Editorial');
+          delete m.imageUrl;
       }
+      apiCache.set(cacheKey, m);
       res.json({ data: m });
-    } catch (e) {
-      res.status(500).json({ error: "Failed to fetch article" });
+    } catch (e: any) {
+      console.error('Firebase fetching single article failed, falling back to Drizzle:', e.message);
+      try {
+        const id = req.params.id;
+        const [drizzleArticle] = await drizzleDb.select().from(sourceItems).where(eq(sourceItems.id, id.replace('article-', 'src-'))).limit(1);
+        if (!drizzleArticle) {
+            return res.status(404).json({ error: "Not found" });
+        }
+        const m = {
+          id: drizzleArticle.id,
+          title: drizzleArticle.originalTitle || "Untitled",
+          slug: drizzleArticle.id,
+          sourceName: drizzleArticle.sourceName || "Global Syndicate",
+          sourceUrl: drizzleArticle.sourceUrl || "#",
+          originalUrl: drizzleArticle.originalUrl || "#",
+          publishedAt: drizzleArticle.originalPublishedAt || new Date().toISOString(),
+          fetchedAt: drizzleArticle.fetchedAt || new Date().toISOString(),
+          category: drizzleArticle.category || "Economy",
+          region: "Global",
+          language: "en",
+          aiSummary: drizzleArticle.excerpt || "Initial signals intercepted. Awaiting full AI analysis.",
+          fullContent: drizzleArticle.excerpt || "Initial signals intercepted. Awaiting full AI analysis.",
+          tags: ["Live Feed", "Unclassified"],
+          importanceScore: 70 + Math.floor(Math.random() * 20),
+          relevanceScore: 75 + Math.floor(Math.random() * 20),
+          credibilityScore: drizzleArticle.credibilityScore || 85,
+        };
+        apiCache.set(cacheKey, m);
+        res.json({ data: m });
+      } catch (fallbackErr) {
+        res.status(500).json({ error: "Failed to fetch article" });
+      }
     }
   });
 
@@ -797,8 +880,9 @@ Output exactly this JSON format:
 
       await setDoc(docRef, article);
       if (article.imageUrl && (article.imageUrl.includes('picsum.photos') || article.imageUrl.includes('api/assets/visual'))) {
-          article.imageUrl = getStableImage(article.title || "default", article.category || 'Editorial');
+          delete (article as any).imageUrl;
       }
+      apiCache.delete(`news_id_${req.params.id}`);
       res.json({ data: article });
     } catch (e) {
       res.status(500).json({ error: "Failed to analyze" });

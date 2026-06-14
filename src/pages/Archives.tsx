@@ -36,11 +36,6 @@ export default function Archives() {
             <Link key={article.id} to={`/article/${article.slug || article.id}`}>
               <Card className="hover:bg-muted/50 transition-colors border-l-4 border-l-transparent hover:border-l-primary cursor-pointer mb-6 rounded-none">
                 <CardContent className="p-6 flex flex-col md:flex-row gap-6">
-                  {article.imageUrl && (
-                    <div className="w-full md:w-48 h-32 shrink-0 bg-muted overflow-hidden">
-                      <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
-                    </div>
-                  )}
                   <div className="flex-1">
                     <div className="flex items-center text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                        <span>{new Date(article.publishedAt).toLocaleDateString()}</span>

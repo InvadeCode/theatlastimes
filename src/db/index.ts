@@ -14,7 +14,11 @@ export const createPool = () => {
 
 const pool = createPool();
 
-pool.on('error', (err) => {
+pool.on('error', (err: any) => {
+  if (err.message && err.message.includes('terminating connection due to administrator command')) {
+    // Expected on scale-to-zero serverless databases
+    return;
+  }
   console.error('Unexpected error on idle SQL pool client:', err);
 });
 

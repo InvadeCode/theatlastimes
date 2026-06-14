@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow, format } from "date-fns";
+import { Helmet } from "react-helmet-async";
 import { Article, AI_Briefing } from "../types";
 
 export default function Home() {
@@ -67,6 +68,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-0 bg-background text-foreground">
+        <Helmet>
+            <title>The Atlas Times | Real-Time Global Updates</title>
+            <meta name="description" content="Discover intelligence briefings and global news curated for clarity. Fast, AIO-optimized insights covering Geopolitics, Technology, and Markets." />
+        </Helmet>
         
       {/* Top Story Strip */}
       <div className="hidden lg:grid grid-cols-4 gap-4 py-4 border-b border-border mb-8">
@@ -118,11 +123,6 @@ export default function Home() {
           <section className="col-span-1 lg:col-span-6 flex flex-col pl-4">
               {heroArticle && (
                   <Link to={`/article/${heroArticle.id}`} className="group relative w-full mb-8 overflow-hidden bg-background">
-                      {heroArticle.imageUrl && (
-                          <div className="w-full aspect-[4/3] md:aspect-[5/4] bg-muted mb-4">
-                              <img src={heroArticle.imageUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700" />
-                          </div>
-                      )}
                       <div className="flex flex-col p-2">
                           <span className="bg-primary text-primary-foreground text-[10px] uppercase font-bold px-1.5 py-0.5 w-fit mb-3 shadow-sm">{heroArticle.category}</span>
                           <h2 className="text-foreground font-serif font-black text-3xl md:text-5xl leading-tight mb-4 group-hover:text-primary transition-colors tracking-tight">
@@ -148,11 +148,6 @@ export default function Home() {
                  
                  {popularStories.map((article, idx) => (
                     <div key={article.id} className="mb-6 last:mb-0 border-b border-border pb-6 last:border-0 group">
-                        {idx === 0 && article.imageUrl ? (
-                           <Link to={`/article/${article.id}`} className="block w-full aspect-[16/9] mb-4 bg-muted overflow-hidden">
-                               <img src={article.imageUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                           </Link>
-                        ) : null}
                         <Link to={`/article/${article.id}`}>
                             {idx === 3 && (
                                 <span className="bg-primary text-primary-foreground text-[8px] uppercase font-bold px-1.5 py-0.5 mb-2 inline-block shadow-sm">Exclusive</span>
@@ -178,25 +173,13 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {breakingNews.map((article, idx) => (
                  <Link to={`/article/${article.id}`} key={article.id} className="group relative w-full aspect-[4/5] bg-zinc-900 border border-border overflow-hidden flex flex-col">
-                     {article.imageUrl ? (
-                         <div className="absolute inset-0">
-                             <img src={article.imageUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4">
-                                 <span className="bg-primary text-primary-foreground text-[10px] uppercase font-bold px-1.5 py-0.5 w-fit mb-3">{article.category}</span>
-                                 <h3 className="text-white font-serif font-bold text-lg leading-tight drop-shadow-md">
-                                     {article.title}
-                                 </h3>
-                             </div>
-                         </div>
-                     ) : (
                          <div className="absolute flex flex-col justify-center items-center text-center p-6 inset-0 bg-zinc-900 text-white">
                             <span className="text-primary text-[10px] uppercase font-bold tracking-widest mb-4 border-b border-primary/50 pb-2">{article.category}</span>
-                            <h3 className="text-white font-serif font-bold text-xl leading-tight mb-4">
+                            <h3 className="text-white font-serif font-bold text-xl leading-tight mb-4 group-hover:text-primary transition-colors">
                                 {article.title}
                             </h3>
                             <p className="text-zinc-400 text-xs italic font-serif opacity-80">{format(new Date(article.publishedAt), 'MMM d, yyyy')}</p>
                          </div>
-                     )}
                  </Link>
               ))}
           </div>
@@ -211,11 +194,6 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {geopolitics.map(article => (
                   <Link to={`/article/${article.id}`} key={article.id} className="group flex flex-col">
-                       {article.imageUrl && (
-                           <div className="w-full aspect-[16/9] overflow-hidden bg-muted mb-4">
-                               <img src={article.imageUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
-                           </div>
-                       )}
                        <span className="text-[10px] text-primary uppercase tracking-widest font-bold mb-2">{article.region}</span>
                        <h3 className="font-serif font-bold text-lg leading-tight mb-3 group-hover:text-primary transition-colors">{article.title}</h3>
                        <p className="text-xs text-muted-foreground line-clamp-3 mb-4">{article.aiSummary}</p>
@@ -256,12 +234,7 @@ export default function Home() {
               <div className="lg:col-span-8 flex flex-col">
                   {economy[0] && (
                      <Link to={`/article/${economy[0].id}`} className="group flex flex-col md:flex-row gap-6 pb-8 border-b border-border mb-8">
-                         {economy[0].imageUrl && (
-                             <div className="w-full md:w-1/2 aspect-[4/3] bg-muted overflow-hidden shrink-0">
-                                 <img src={economy[0].imageUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
-                             </div>
-                         )}
-                         <div className="w-full md:w-1/2 flex flex-col justify-center">
+                         <div className="w-full flex flex-col justify-center">
                              <span className="text-[10px] text-primary uppercase tracking-widest font-bold mb-3">{economy[0].region}</span>
                              <h3 className="font-serif font-black text-3xl leading-tight mb-4 group-hover:text-primary transition-colors">{economy[0].title}</h3>
                              <p className="text-sm font-serif text-muted-foreground leading-relaxed mb-6">{economy[0].aiSummary}</p>
@@ -272,11 +245,6 @@ export default function Home() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                       {economy.slice(1, 5).map(article => (
                           <Link to={`/article/${article.id}`} key={article.id} className="group flex gap-4">
-                               {article.imageUrl && (
-                                   <div className="w-24 h-24 bg-muted overflow-hidden shrink-0">
-                                       <img src={article.imageUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
-                                   </div>
-                               )}
                                <div className="flex flex-col justify-center">
                                    <h4 className="font-serif font-bold text-sm leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-3">{article.title}</h4>
                                    <span className="text-[9px] font-bold text-muted-foreground uppercase mt-auto">{format(new Date(article.publishedAt), 'MMM d')}</span>
@@ -366,17 +334,12 @@ export default function Home() {
           <div className="columns-1 sm:columns-2 lg:columns-4 gap-8">
               {moreStories.slice(4).map((article, idx) => (
                   <Link to={`/article/${article.id}`} key={article.id} className="group flex flex-col items-start pt-4 border-t border-border/50 mb-8 break-inside-avoid">
-                     {idx % 3 === 0 && article.imageUrl && (
-                         <div className="w-full h-32 mb-4 bg-muted overflow-hidden">
-                             <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                         </div>
-                     )}
                      <div className="w-full flex justify-between items-start mb-3">
                          <span className="text-[10px] text-primary uppercase tracking-widest font-bold">{article.category}</span>
                          <span className="text-[9px] text-muted-foreground uppercase font-bold">{formatDistanceToNow(new Date(article.publishedAt))}</span>
                      </div>
                      <h3 className="font-serif font-bold text-base leading-tight mb-2 group-hover:text-primary transition-colors">{article.title}</h3>
-                     <p className="text-sm text-foreground/80 line-clamp-4 leading-relaxed">{article.excerpt || article.aiSummary}</p>
+                     <p className="text-sm text-foreground/80 line-clamp-4 leading-relaxed">{article.aiSummary}</p>
                   </Link>
               ))}
           </div>

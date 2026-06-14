@@ -46,11 +46,6 @@ export default function Feed() {
             {/* Top Category Story */}
             {heroArticle && (
                 <Link to={`/article/${heroArticle.id}`} className="group grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-b border-border pb-12">
-                    {heroArticle.imageUrl && (
-                        <div className="w-full h-64 md:h-96 overflow-hidden bg-muted">
-                            <img src={heroArticle.imageUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="" />
-                        </div>
-                    )}
                     <div className="flex flex-col justify-center">
                         <span className="text-[10px] text-primary uppercase font-bold tracking-wider mb-4 border border-primary px-2 py-1 w-fit">{heroArticle.region}</span>
                         <h2 className="font-serif font-black text-4xl mb-6 leading-tight group-hover:text-primary transition-colors">{heroArticle.title}</h2>
@@ -68,11 +63,6 @@ export default function Feed() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                {gridArticles.map((article) => (
                    <Link to={`/article/${article.id}`} key={article.id} className="group flex flex-col">
-                       {article.imageUrl && (
-                           <div className="w-full h-48 overflow-hidden bg-muted mb-4">
-                               <img src={article.imageUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
-                           </div>
-                       )}
                        <span className="text-[10px] text-primary uppercase tracking-widest font-bold mb-2">{isRegion ? article.category : article.region}</span>
                        <h3 className="font-serif font-bold text-lg leading-tight mb-2 group-hover:text-primary transition-colors">{article.title}</h3>
                        <p className="text-xs text-muted-foreground line-clamp-3 mb-4">{article.aiSummary}</p>

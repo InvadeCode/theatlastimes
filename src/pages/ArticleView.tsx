@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { formatDistanceToNow, format } from "date-fns";
+import { Helmet } from "react-helmet-async";
 import { Article } from "../types";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -37,6 +38,17 @@ export default function ArticleView() {
 
   return (
     <article className="max-w-5xl mx-auto space-y-10 py-8">
+       <Helmet>
+           <title>{article.title} - The Atlas Times</title>
+           <meta name="description" content={article.aiSummary?.substring(0, 160) || "Read the latest global intelligence report on The Atlas Times."} />
+           <meta property="og:title" content={`${article.title} | Premium Briefing`} />
+           <meta property="og:description" content={article.aiSummary?.substring(0, 160)} />
+           <meta property="og:type" content="article" />
+           <meta name="twitter:card" content="summary" />
+           <meta name="twitter:title" content={article.title} />
+           <meta name="twitter:description" content={article.aiSummary?.substring(0, 160)} />
+       </Helmet>
+
        {/* Meta */}
        <div className="flex items-center space-x-3 text-xs uppercase tracking-widest font-bold">
            <Link to={`/category/${article.category.toLowerCase()}`} className="text-primary hover:underline">{article.category}</Link>
@@ -63,23 +75,6 @@ export default function ArticleView() {
              <Badge variant="outline" className="text-xs uppercase scale-90">Analysis</Badge>
           </div>
        </div>
-
-       {/* Visual */}
-       {article.imageUrl && (
-         <div className="flex flex-col mb-8">
-             <div className="w-full h-80 md:h-[500px] overflow-hidden rounded bg-muted">
-                <img src={article.imageUrl} alt={article.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-             </div>
-             {(article.imageCredit || article.imageSource) && (
-                 <div className="text-[10px] text-muted-foreground uppercase text-right mt-2 font-mono flex items-center justify-end gap-2">
-                    {article.imageCaption && <span className="mr-auto normal-case font-sans italic opacity-80">{article.imageCaption}</span>}
-                    Image: {article.imageCredit && <span className="font-bold">{article.imageCredit}</span>}
-                    {article.imageCredit && article.imageSource && <span>/</span>}
-                    {article.imageSource && <span>{article.imageSource}</span>}
-                 </div>
-             )}
-         </div>
-       )}
 
        {/* AI Summary Section - Premium Look */}
        <div className="bg-muted/30 border-l-4 border-primary p-6 md:p-10 rounded shadow-sm">
