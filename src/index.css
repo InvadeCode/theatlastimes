@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Chomsky&family=UnifrakturCook:wght@700&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@theme {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Old Standard TT", "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-old-english: "UnifrakturCook", ui-serif, Georgia, serif;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-marquee: marquee 35s linear infinite;
+
+  @keyframes marquee {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 0 0% 7%; /* #111111 */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 355 78% 50%; /* #e21d2f */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 97%; /* #f7f7f7 */
+    --secondary-foreground: 0 0% 7%;
+    --muted: 0 0% 97%; 
+    --muted-foreground: 0 0% 33%; /* #555555 */
+    --accent: 0 0% 97%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 0 0% 93%; /* #eeeeee */
+    --input: 0 0% 93%;
+    --ring: 355 78% 50%;
+    --radius: 0;
+  }
+
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 355 78% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 33%;
+    --accent: 0 0% 97%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 0 0% 93%;
+    --input: 0 0% 93%;
+    --ring: 355 78% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+
+  .article-content {
+    @apply font-serif text-lg leading-relaxed text-foreground opacity-90;
+  }
+  .article-content p {
+    @apply mb-6;
+  }
+  .article-content a {
+    @apply font-bold underline decoration-primary underline-offset-4 hover:text-primary transition-colors;
+  }
+  .article-content h2, .article-content h3 {
+    @apply font-bold mt-10 mb-4 text-foreground font-serif;
+  }
+  .article-content h2 {
+    @apply text-3xl;
+  }
+  .article-content h3 {
+    @apply text-2xl;
+  }
+  .article-content ul, .article-content ol {
+    @apply pl-6 mb-6 list-disc;
+  }
+  .article-content li {
+    @apply mb-2;
+  }
+  .article-content img {
+    @apply my-6 rounded shadow-sm max-w-full;
+  }
+}
+
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
