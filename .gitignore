@@ -1,0 +1,24 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Test files
+test.js
+test.json
+test2.js
+test4.js
+test5.js
+test-fetch.js
+delete-test-firebase.ts
+delete-test-postgres.ts
+inspect.js
+inspect-db.ts
+
+# Databases
+sqlite.db
+*.db
