@@ -22,3 +22,4 @@ inspect-db.ts
 # Databases
 sqlite.db
 *.db
+drizzle.config.ts
